@@ -20,8 +20,11 @@
     <script src="https://github.com/pixijs/sound/releases/download/v6.0.0/pixi-sound.js"></script>
 
     <script type="module">
-        // Parametry gry
+        // Wyniki gry
+        let bestScores = [];
         let gameStopped = true;
+
+        // Parametry gry
         let playerSpeed = 5;
         let maxPlayerSpeed = 15;
         let objectSpeed = 1;
@@ -188,13 +191,26 @@
         mainText.y = app.canvas.height / 2 - mainText.height / 2;
         app.stage.addChild(mainText);
 
+        // Lista najlepszych wyników
+        let bestScoresText = new PIXI.Text('', { fontSize: 24, fill: 'white' });
+        bestScoresText.x = app.canvas.width / 2 - bestScoresText.width / 2;
+        bestScoresText.y = 100;
+        app.stage.addChild(bestScoresText);
+
         // Funkcja końca gry
         function gameOver() {
             gameStopped = true;
             PIXI.sound.play('koniec_gry');
+            
+            bestScores.push(score);
+            bestScores.sort((a, b) => b - a);
+            bestScores = bestScores.slice(0, 3);
+            let bestScoresStr = bestScores.map((score, index) => `${index + 1}. ${score}`).join('\n');
 
             mainText.text = `Koniec gry`;
             mainText.x = app.canvas.width / 2 - mainText.width / 2;
+            bestScoresText.text = `Najlepsze wyniki:\n${bestScoresStr}`;
+            bestScoresText.x = app.canvas.width / 2 - bestScoresText.width / 2;
 
             clearTimeout(spawnObjectTimeout);
             clearTimeout(updateDifficultyTimeout);
@@ -215,6 +231,7 @@
             lives = 5;
             scoreText.text = `Wynik: ${score}`;
             livesText.text = `Liczba żyć: ${lives}`;
+            bestScoresText.text = '';
             mainText.text = '';
             
             spawnObject();
