@@ -216,3 +216,27 @@ for (let i = 0; i < 5; i++) {
     }
     console.log(i);
 }
+
+// jak napisać klasę
+// konwencja nazewnictwa klas to PascalCase
+class Person {
+    // równoważne __init__ w Pythonie
+    constructor(name, age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    // nie ma potrzeby używania słowa kluczowego `function`
+    isAdult() {
+        return this.age >= 18;
+    }
+}
+
+let jan = new Person('Jan', 15);
+jan.isAdult();
+
+let janina = new Person('Janina', 30);
+janina.isAdult();
+
+// to nie wszystko! 
+// sprawdź dokumentację, aby uzyskać więcej informacji
