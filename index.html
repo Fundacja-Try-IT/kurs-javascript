@@ -34,12 +34,12 @@
             </div>
         </div>
         
-        <!-- jak wyświetlić wiadomość -->
+        <!-- jak dostać się do elementu strony i zmienić jego styl -->
         <script type="text/javascript">
-            alert('Witaj Świecie!');
-            let name = prompt('Jak się nazywasz?');
-            let sure = confirm('Czy jesteś pewien?');
-            console.log(`${name} jest pewien swojego imienia: ${sure}`);
+            setTimeout(() => {
+                let box = document.querySelector('#click');
+                box.style.backgroundColor = 'lightgreen';
+            }, 3000); // zaczekaj 3 sekundy przed zmianą koloru
         </script>
     </body>
 </html>
