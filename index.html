@@ -81,8 +81,20 @@
             object.scale.set(1.2, 1.2);
             app.stage.addChild(object);
             objects.push(object);
-            spawnObjectTimeout = setTimeout(spawnObject, objectSpawnRate);
+            spawnObjectTimeout = setTimeout(spawnObject, 3000);
         }
+
+        // Funkcja do aktualizacji pozycji spadających obiektów
+        app.ticker.add(() => {
+            for (let object of objects) {
+                object.y += object.vy;
+                // Usuwanie obiektów, które wypadają z ekranu
+                if (object.getBounds().maxY > app.canvas.height) {
+                    app.stage.removeChild(object);
+                    objects = objects.filter(o => o !== object);
+                }
+            }
+        });
 
         spawnObject();  // Rozpoczęcie generowania obiektów
     </script>
