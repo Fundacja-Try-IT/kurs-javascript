@@ -20,6 +20,10 @@
     <script src="https://github.com/pixijs/sound/releases/download/v6.0.0/pixi-sound.js"></script>
 
     <script type="module">
+        // Wyniki gry
+        let bestScores = [];
+        let gameStopped = true;
+
         // Parametry gry
         let playerSpeed = 5;
         let maxPlayerSpeed = 15;
@@ -27,6 +31,8 @@
         let objectScore = 10;
         let objectSpawnRate = 3000;
         let objectMinSpawnRate = 400;
+        let objectSkewSpeed = 1;
+        let objectMaxSkewSpeed = 6;
 
         let app = new PIXI.Application();  // Tworzenie aplikacji PixiJS
         await app.init({
@@ -63,8 +69,13 @@
         window.addEventListener('keydown', event => {
             if (event.key === 'ArrowLeft') {           // Jeśli naciśnięto strzałkę w lewo
                 player.vx = -playerSpeed;              // Ustaw prędkość gracza na ujemną
+                player.scale.x = -3;
             } else if (event.key === 'ArrowRight') {   // Jeśli naciśnięto strzałkę w prawo
                 player.vx = playerSpeed;               // Ustaw prędkość gracza na dodatnią
+                player.scale.x = 3;
+            } else if (event.key === ' ' && gameStopped) {
+                restartGame();
+                gameStopped = false;
             }
         });
         window.addEventListener('keyup', event => {
@@ -90,6 +101,7 @@
             let object = PIXI.Sprite.from('obiekt.png');
             object.x = Math.random() * (app.canvas.width - object.width - 1);   // Losowa pozycja obiektu
             object.y = -object.height;                                          // Pozycja startowa obiektu poza ekranem
+            object.vx = Math.random() * objectSkewSpeed - objectSkewSpeed / 2;   
             object.vy = objectSpeed + Math.random();                            // Losowa prędkość obiektu
             object.scale.set(1.2, 1.2);
             app.stage.addChild(object);
@@ -105,6 +117,7 @@
             objectSpeed += 0.2;
             objectScore += 1;
             objectSpawnRate = Math.max(objectMinSpawnRate, objectSpawnRate - 100);
+            objectSkewSpeed = Math.min(objectMaxSkewSpeed, objectSkewSpeed + 0.1);
             updateDifficultyTimeout = setTimeout(updateDifficulty, 5000);
         }
 
@@ -126,7 +139,13 @@
         // Funkcja do aktualizacji pozycji spadających obiektów
         app.ticker.add(() => {
             for (let object of objects) {
+                // Zapobiega wychodzeniu obiektów poza granice
+                if (object.getBounds().maxX >= app.canvas.width || object.getBounds().minX <= 0) {
+                    object.vx *= -1;   // Zmiana kierunku obiektu po odbiciu od ściany
+                }
+
                 object.y += object.vy;
+                object.x += object.vx;
 
                 // Detekcja kolizji
                 if (hitTestRectangle(player, object)) {
@@ -146,20 +165,11 @@
                     PIXI.sound.play('upadek');                 // Odtworzenie dźwięku upadku
 
                     if (lives <= 0) {                      // Jeśli liczba żyć spadnie do 0, zakończ grę
-                        mainText.text = 'Koniec gry!';     // Wyświetlenie tekstu końcowego
-                        mainText.x = app.canvas.width / 2 - mainText.width / 2;    // Wyśrodkowanie tekstu
-                        mainText.y = app.canvas.height / 2 - mainText.height / 2;  // Wyśrodkowanie tekstu
-                        app.ticker.stop();                 // Zatrzymanie animacji
-                        clearTimeout(spawnObjectTimeout);  // Zatrzymanie generatora obiektów
-                        clearTimeout(updateDifficultyTimeout);  // Zatrzymanie zwiększania trudności
-                        PIXI.sound.play('koniec_gry');     // Odtworzenie dźwięku końca gry
+                        gameOver();
                     }
                 }
             }
         });
-
-        spawnObject();  // Rozpoczęcie generowania obiektów
-        updateDifficulty();  // Rozpoczęcie zwiększania trudności
 
         // Tekst z wynikiem
         let score = 0;
@@ -176,9 +186,56 @@
         app.stage.addChild(livesText);
 
         // Tekst główny
-        let mainText = new PIXI.Text('', { fontSize: 48, fill: 'white' });
+        let mainText = new PIXI.Text('Naciśnij spację aby rozpocząć grę', { fontSize: 48, fill: 'white' });
         mainText.x = app.canvas.width / 2 - mainText.width / 2;
         mainText.y = app.canvas.height / 2 - mainText.height / 2;
         app.stage.addChild(mainText);
+
+        // Lista najlepszych wyników
+        let bestScoresText = new PIXI.Text('', { fontSize: 24, fill: 'white' });
+        bestScoresText.x = app.canvas.width / 2 - bestScoresText.width / 2;
+        bestScoresText.y = 100;
+        app.stage.addChild(bestScoresText);
+
+        // Funkcja końca gry
+        function gameOver() {
+            gameStopped = true;
+            PIXI.sound.play('koniec_gry');
+            
+            bestScores.push(score);
+            bestScores.sort((a, b) => b - a);
+            bestScores = bestScores.slice(0, 3);
+            let bestScoresStr = bestScores.map((score, index) => `${index + 1}. ${score}`).join('\n');
+
+            mainText.text = `Koniec gry`;
+            mainText.x = app.canvas.width / 2 - mainText.width / 2;
+            bestScoresText.text = `Najlepsze wyniki:\n${bestScoresStr}`;
+            bestScoresText.x = app.canvas.width / 2 - bestScoresText.width / 2;
+
+            clearTimeout(spawnObjectTimeout);
+            clearTimeout(updateDifficultyTimeout);
+
+            objects.forEach(object => app.stage.removeChild(object));
+            objects = [];
+        }
+
+        // Funkcja restartująca grę
+        function restartGame() {
+            playerSpeed = 5;
+            objectSpeed = 1;
+            objectScore = 10;
+            objectSpawnRate = 3000;
+            objectSkewSpeed = 1;
+
+            score = 0;
+            lives = 5;
+            scoreText.text = `Wynik: ${score}`;
+            livesText.text = `Liczba żyć: ${lives}`;
+            bestScoresText.text = '';
+            mainText.text = '';
+            
+            spawnObject();
+            updateDifficulty();
+        }
     </script>
 </html>
