@@ -40,8 +40,31 @@
         let player = PIXI.Sprite.from('gracz.png');          // Tworzenie obiektu gracza
         player.x = app.canvas.width / 2;                     // Ustawienie pozycji gracza na środku
         player.y = app.canvas.height - player.height - 10;   // Ustawienie pozycji gracza na dole ekranu
+        player.vx = 0;                                       // Ustawienie początkowej prędkości gracza na 0
         player.scale.set(3, 3);                              // Ustawienie skali (wielkości) gracza
         player.anchor.set(0.5);                              // Ustawienie punktu obrotu gracza na środek
         app.stage.addChild(player);                          // Dodanie gracza do sceny
+
+        window.addEventListener('keydown', event => {
+            if (event.key === 'ArrowLeft') {           // Jeśli naciśnięto strzałkę w lewo
+                player.vx = -5;                        // Ustaw prędkość gracza na ujemną
+            } else if (event.key === 'ArrowRight') {   // Jeśli naciśnięto strzałkę w prawo
+                player.vx = 5;                         // Ustaw prędkość gracza na dodatnią
+            }
+        });
+        window.addEventListener('keyup', event => {
+            // Jeśli puszczono strzałkę w lewo lub w prawo, zatrzymaj gracza
+            if (event.key === 'ArrowLeft' && player.vx < 0) {
+                player.vx = 0;
+            } else if (event.key === 'ArrowRight' && player.vx > 0) {
+                player.vx = 0;
+            }
+        });
+        
+        app.ticker.add(() => {            // Funkcja aktualizująca pozycję gracza
+            player.x += player.vx;        // Przesunięcie gracza o jego prędkość
+            // Zapobiega wychodzeniu gracza poza granice ekranu
+            player.x = Math.max(player.width / 2, Math.min(app.canvas.width - player.width / 2, player.x));
+        });
     </script>
 </html>
