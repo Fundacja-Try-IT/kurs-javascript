@@ -34,14 +34,19 @@
             </div>
         </div>
         
-        <!-- jak dodać do elementu strony schemat `event listener` -->
+        <!-- jak utworzyć albo usunąć element -->
         <script type="text/javascript">
-            let box = document.querySelector('#click');
-            let score = 0;
-            box.addEventListener('click', () => {
-                score++;
-                box.textContent = `Wynik: ${score}`;
-            });
+            setTimeout(() => {
+                let box = document.querySelector('#click');
+                let message = document.createElement('div');
+                message.textContent = 'Dodadkowa wiadomość';
+                message.style.color = 'red';
+                box.appendChild(message);
+
+                setTimeout(() => {
+                    box.removeChild(message);
+                }, 2000);
+            }, 3000);
         </script>
     </body>
 </html>
