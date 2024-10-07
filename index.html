@@ -34,19 +34,22 @@
             </div>
         </div>
         
-        <!-- jak utworzyć albo usunąć element -->
+        <!-- jak zmodyfikować listę -->
         <script type="text/javascript">
-            setTimeout(() => {
-                let box = document.querySelector('#click');
-                let message = document.createElement('div');
-                message.textContent = 'Dodadkowa wiadomość';
-                message.style.color = 'red';
-                box.appendChild(message);
-
-                setTimeout(() => {
-                    box.removeChild(message);
-                }, 2000);
-            }, 3000);
+            let list = document.querySelector('#list');
+            list.style.visibility = 'visible';
+            let box = document.querySelector('#click');
+            box.style.visibility = 'hidden';
+            
+            let items = document.querySelectorAll('#list li');
+            let startValue = 1;
+            
+            setInterval(() => {
+                items.forEach((li, index) => {
+                    li.textContent = `Element ${index + startValue}`;
+                });
+                startValue++;
+            }, 1000);
         </script>
     </body>
 </html>
