@@ -169,3 +169,50 @@ if (age >= 18) {
 
 // jednolinijkowa instrukcja if
 console.log(age >= 18 ? 'You are an adult' : 'You are not an adult');
+
+// jak napisać pętlę for (zwróć uwagę, ze różni się ona od Pythona!)
+// for (inicjalizacja; warunek; krok) { ... }
+for (let i = 0; i < 5; i++) {
+    console.log(i);
+}
+
+// jak iterować po tablicy
+for (let number of numbers) {
+    console.log(number);
+}
+
+// jak zastosować funkcję do każdego elementu tablicy
+// zwróć uwagę, że jest to funkcja anonimowa
+numbers.forEach(function (number) {
+    console.log('Kwadrat liczby ' + number + ' to ' + number ** 2);
+});
+
+// jak napisać pętlę while
+let i = 0;
+while (i < 5) {
+    console.log(i);
+    i++;
+}
+
+// jak napisać pętlę do-while
+// zwróć uwagę, że pętla do-while zawsze wykona się przynajmniej raz!
+let j = 0;
+do {
+    console.log(j);
+    j++;
+} while (j < 5);
+
+// przerywanie pętli i kontynuacja (analogicznie do Pythona)
+for (let i = 0; i < 5; i++) {
+    if (i === 3) {
+        break;
+    }
+    console.log(i);
+}
+
+for (let i = 0; i < 5; i++) {
+    if (i === 3) {
+        continue;
+    }
+    console.log(i);
+}
