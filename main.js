@@ -136,3 +136,19 @@ person // to wypisze { name: 'Jan', age: 30, isAdult: true, city: 'Bydgoszcz' }
 // jak usunąć atrybut obiektu
 delete person.age;
 person // to wypisze { name: 'Jan', isAdult: true, city: 'Bydgoszcz' }
+
+// jak napisać funkcję zwracająca obiekt
+function operators(x, y) {
+    // Wykonujemy proste obliczenia
+    let sum = x + y;
+    let product = x * y;
+    let difference = x - y;
+
+    // Tworzymy i zwracamy obiekt
+    return {
+        sum: sum,
+        product: product,
+        difference: difference,
+        average: sum / 2
+    };
+}
