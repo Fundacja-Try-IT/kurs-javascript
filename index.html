@@ -20,6 +20,14 @@
     <script src="https://github.com/pixijs/sound/releases/download/v6.0.0/pixi-sound.js"></script>
 
     <script type="module">
+        // Parametry gry
+        let playerSpeed = 5;
+        let maxPlayerSpeed = 15;
+        let objectSpeed = 1;
+        let objectScore = 10;
+        let objectSpawnRate = 3000;
+        let objectMinSpawnRate = 400;
+
         let app = new PIXI.Application();  // Tworzenie aplikacji PixiJS
         await app.init({
             autoDensity: true,             // Automatyczne dostosowanie rozdzielczości
@@ -54,9 +62,9 @@
 
         window.addEventListener('keydown', event => {
             if (event.key === 'ArrowLeft') {           // Jeśli naciśnięto strzałkę w lewo
-                player.vx = -5;                        // Ustaw prędkość gracza na ujemną
+                player.vx = -playerSpeed;              // Ustaw prędkość gracza na ujemną
             } else if (event.key === 'ArrowRight') {   // Jeśli naciśnięto strzałkę w prawo
-                player.vx = 5;                         // Ustaw prędkość gracza na dodatnią
+                player.vx = playerSpeed;               // Ustaw prędkość gracza na dodatnią
             }
         });
         window.addEventListener('keyup', event => {
@@ -82,11 +90,22 @@
             let object = PIXI.Sprite.from('obiekt.png');
             object.x = Math.random() * (app.canvas.width - object.width - 1);   // Losowa pozycja obiektu
             object.y = -object.height;                                          // Pozycja startowa obiektu poza ekranem
-            object.vy = 1;
+            object.vy = objectSpeed + Math.random();                            // Losowa prędkość obiektu
             object.scale.set(1.2, 1.2);
             app.stage.addChild(object);
             objects.push(object);
-            spawnObjectTimeout = setTimeout(spawnObject, 3000);
+            spawnObjectTimeout = setTimeout(spawnObject, objectSpawnRate);
+        }
+
+        // Zwiększanie trudności gry co 5 sekund
+        let updateDifficultyTimeout;
+
+        function updateDifficulty() {
+            playerSpeed = Math.min(maxPlayerSpeed, playerSpeed + 0.5);
+            objectSpeed += 0.2;
+            objectScore += 1;
+            objectSpawnRate = Math.max(objectMinSpawnRate, objectSpawnRate - 100);
+            updateDifficultyTimeout = setTimeout(updateDifficulty, 5000);
         }
 
         // Funkcja wykrywająca kolizje
@@ -113,7 +132,7 @@
                 if (hitTestRectangle(player, object)) {
                     app.stage.removeChild(object);
                     objects = objects.filter(o => o !== object);
-                    score += 10;                              // Zwiększenie wyniku
+                    score += objectScore;                     // Zwiększenie wyniku
                     scoreText.text = `Wynik: ${score}`;       // Aktualizacja tekstu
                     PIXI.sound.play('przechwyt');             // Odtworzenie dźwięku przechwycenia
                 }
@@ -132,6 +151,7 @@
                         mainText.y = app.canvas.height / 2 - mainText.height / 2;  // Wyśrodkowanie tekstu
                         app.ticker.stop();                 // Zatrzymanie animacji
                         clearTimeout(spawnObjectTimeout);  // Zatrzymanie generatora obiektów
+                        clearTimeout(updateDifficultyTimeout);  // Zatrzymanie zwiększania trudności
                         PIXI.sound.play('koniec_gry');     // Odtworzenie dźwięku końca gry
                     }
                 }
@@ -139,6 +159,7 @@
         });
 
         spawnObject();  // Rozpoczęcie generowania obiektów
+        updateDifficulty();  // Rozpoczęcie zwiększania trudności
 
         // Tekst z wynikiem
         let score = 0;
