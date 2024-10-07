@@ -152,3 +152,20 @@ function operators(x, y) {
         average: sum / 2
     };
 }
+
+// jak napisać instrukcję warunkową
+let age = 17;
+
+if (age >= 18) {
+    console.log('You are an adult');
+} else if (age >= 13) {
+    console.log('You are a teenager');
+} else {
+    console.log('You are a child');
+}
+
+// zamiast instrukcji warunkowej `if-else` można użyć `switch-case`
+// po więcej szczegółów zajrzyj do dokumentacji 
+
+// jednolinijkowa instrukcja if
+console.log(age >= 18 ? 'You are an adult' : 'You are not an adult');
