@@ -108,16 +108,48 @@
                 if (hitTestRectangle(player, object)) {
                     app.stage.removeChild(object);
                     objects = objects.filter(o => o !== object);
+                    score += 10;                              // Zwiększenie wyniku
+                    scoreText.text = `Wynik: ${score}`;       // Aktualizacja tekstu
                 }
 
                 // Usuwanie obiektów, które wypadają z ekranu
                 if (object.getBounds().maxY > app.canvas.height) {
                     app.stage.removeChild(object);
                     objects = objects.filter(o => o !== object);
+                    lives--;                                  // Zmniejszenie liczby żyć
+                    livesText.text = `Liczba żyć: ${lives}`;  // Aktualizacja tekstu
+
+                    if (lives <= 0) {                      // Jeśli liczba żyć spadnie do 0, zakończ grę
+                        mainText.text = 'Koniec gry!';     // Wyświetlenie tekstu końcowego
+                        mainText.x = app.canvas.width / 2 - mainText.width / 2;    // Wyśrodkowanie tekstu
+                        mainText.y = app.canvas.height / 2 - mainText.height / 2;  // Wyśrodkowanie tekstu
+                        app.ticker.stop();                 // Zatrzymanie animacji
+                        clearTimeout(spawnObjectTimeout);  // Zatrzymanie generatora obiektów
+                    }
                 }
             }
         });
 
         spawnObject();  // Rozpoczęcie generowania obiektów
+
+        // Tekst z wynikiem
+        let score = 0;
+        let scoreText = new PIXI.Text(`Wynik: ${score}`, { fontSize: 24, fill: 'white' });
+        scoreText.x = 10;
+        scoreText.y = 10;
+        app.stage.addChild(scoreText);
+
+        // Tekst z liczbą żyć
+        let lives = 5;
+        let livesText = new PIXI.Text(`Liczba żyć: ${lives}`, { fontSize: 24, fill: 'white' });
+        livesText.x = app.canvas.width - livesText.width - 30;
+        livesText.y = 10;
+        app.stage.addChild(livesText);
+
+        // Tekst główny
+        let mainText = new PIXI.Text('', { fontSize: 48, fill: 'white' });
+        mainText.x = app.canvas.width / 2 - mainText.width / 2;
+        mainText.y = app.canvas.height / 2 - mainText.height / 2;
+        app.stage.addChild(mainText);
     </script>
 </html>
