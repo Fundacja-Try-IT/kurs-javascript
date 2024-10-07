@@ -94,3 +94,45 @@ console.log(add(5, 10));
 // funkcje strzałkowe (funkcje anonimowe lambda)
 let arrowAdd = (x, y) => x + y;
 console.log(arrowAdd(5, 10));
+
+// jak utworzyć tablicę
+let numbers = [1, 2, 3, 4, 5];
+
+// jak uzyskać dostęp do elementu w tablicy
+let firstNumber = numbers[0];
+let lastNumber = numbers[numbers.length - 1];
+let lastNumber2 = numbers.at(-1); // to jest nowa metoda od ES2022
+
+// tak samo można indeksować łańcuchy znaków
+let firstChar = str[0];
+
+// jak dodać element do tablicy
+numbers.push(6);
+numbers // to wypisze [1, 2, 3, 4, 5, 6]
+
+// jak usunąć ostatni element z tablicy
+let lastElement = numbers.pop();
+numbers // to wypisze [1, 2, 3, 4, 5]
+
+// jak usunąć dowolny element z tablicy
+numbers.splice(1, 1); // usuń jeden element zaczynając od drugiego elementu
+numbers // to wypisze [1, 3, 4, 5]
+
+// jak utworzyć obiekt (słownik)
+let person = {
+    name: 'Jan',
+    age: 30,
+    isAdult: true
+};
+person // to wypisze { name: 'Jan', age: 30, isAdult: true }
+person.name // to wypisze 'Jan'
+person['name'] // to wypisze 'Jan'
+
+// jak dodać lub zmodyfikować atrybut obiektu
+person.city = 'Bydgoszcz';
+person['city'] = 'Bydgoszcz';
+person // to wypisze { name: 'Jan', age: 30, isAdult: true, city: 'Bydgoszcz' }
+
+// jak usunąć atrybut obiektu
+delete person.age;
+person // to wypisze { name: 'Jan', isAdult: true, city: 'Bydgoszcz' }
