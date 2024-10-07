@@ -26,5 +26,15 @@
             resizeTo: document.body        // Rozmiar aplikacji dopasowany do okna przeglądarki
         });
         document.body.appendChild(app.canvas); // Dodanie aplikacji do strony
+
+        let playerTexture = await PIXI.Assets.load('gracz.png'); // Ładowanie tekstur
+        playerTexture.source.scaleMode = 'nearest';              // Ustawienie trybu skalowania
+
+        let player = PIXI.Sprite.from('gracz.png');          // Tworzenie obiektu gracza
+        player.x = app.canvas.width / 2;                     // Ustawienie pozycji gracza na środku
+        player.y = app.canvas.height - player.height - 10;   // Ustawienie pozycji gracza na dole ekranu
+        player.scale.set(3, 3);                              // Ustawienie skali (wielkości) gracza
+        player.anchor.set(0.5);                              // Ustawienie punktu obrotu gracza na środek
+        app.stage.addChild(player);                          // Dodanie gracza do sceny
     </script>
 </html>
