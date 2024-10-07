@@ -33,5 +33,19 @@
                 </ul>
             </div>
         </div>
+        
+        <script type="text/javascript">
+            let box = document.querySelector('#click');
+            let score = 0;
+            box.addEventListener('click', () => {
+                score++;
+                box.textContent = `Wynik: ${score}`;
+                if (score % 2 === 0) {
+                    box.style.backgroundColor = 'lightgreen';
+                } else {
+                    box.style.backgroundColor = 'red';
+                }
+            });
+        </script>
     </body>
 </html>
