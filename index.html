@@ -21,6 +21,7 @@
 
     <script type="module">
         // Parametry gry
+        let gameStopped = true;
         let playerSpeed = 5;
         let maxPlayerSpeed = 15;
         let objectSpeed = 1;
@@ -69,6 +70,9 @@
             } else if (event.key === 'ArrowRight') {   // Jeśli naciśnięto strzałkę w prawo
                 player.vx = playerSpeed;               // Ustaw prędkość gracza na dodatnią
                 player.scale.x = 3;
+            } else if (event.key === ' ' && gameStopped) {
+                restartGame();
+                gameStopped = false;
             }
         });
         window.addEventListener('keyup', event => {
@@ -158,20 +162,11 @@
                     PIXI.sound.play('upadek');                 // Odtworzenie dźwięku upadku
 
                     if (lives <= 0) {                      // Jeśli liczba żyć spadnie do 0, zakończ grę
-                        mainText.text = 'Koniec gry!';     // Wyświetlenie tekstu końcowego
-                        mainText.x = app.canvas.width / 2 - mainText.width / 2;    // Wyśrodkowanie tekstu
-                        mainText.y = app.canvas.height / 2 - mainText.height / 2;  // Wyśrodkowanie tekstu
-                        app.ticker.stop();                 // Zatrzymanie animacji
-                        clearTimeout(spawnObjectTimeout);  // Zatrzymanie generatora obiektów
-                        clearTimeout(updateDifficultyTimeout);  // Zatrzymanie zwiększania trudności
-                        PIXI.sound.play('koniec_gry');     // Odtworzenie dźwięku końca gry
+                        gameOver();
                     }
                 }
             }
         });
-
-        spawnObject();  // Rozpoczęcie generowania obiektów
-        updateDifficulty();  // Rozpoczęcie zwiększania trudności
 
         // Tekst z wynikiem
         let score = 0;
@@ -188,9 +183,42 @@
         app.stage.addChild(livesText);
 
         // Tekst główny
-        let mainText = new PIXI.Text('', { fontSize: 48, fill: 'white' });
+        let mainText = new PIXI.Text('Naciśnij spację aby rozpocząć grę', { fontSize: 48, fill: 'white' });
         mainText.x = app.canvas.width / 2 - mainText.width / 2;
         mainText.y = app.canvas.height / 2 - mainText.height / 2;
         app.stage.addChild(mainText);
+
+        // Funkcja końca gry
+        function gameOver() {
+            gameStopped = true;
+            PIXI.sound.play('koniec_gry');
+
+            mainText.text = `Koniec gry`;
+            mainText.x = app.canvas.width / 2 - mainText.width / 2;
+
+            clearTimeout(spawnObjectTimeout);
+            clearTimeout(updateDifficultyTimeout);
+
+            objects.forEach(object => app.stage.removeChild(object));
+            objects = [];
+        }
+
+        // Funkcja restartująca grę
+        function restartGame() {
+            playerSpeed = 5;
+            objectSpeed = 1;
+            objectScore = 10;
+            objectSpawnRate = 3000;
+            objectSkewSpeed = 1;
+
+            score = 0;
+            lives = 5;
+            scoreText.text = `Wynik: ${score}`;
+            livesText.text = `Liczba żyć: ${lives}`;
+            mainText.text = '';
+            
+            spawnObject();
+            updateDifficulty();
+        }
     </script>
 </html>
