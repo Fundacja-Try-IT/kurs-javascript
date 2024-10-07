@@ -63,8 +63,10 @@
         window.addEventListener('keydown', event => {
             if (event.key === 'ArrowLeft') {           // Jeśli naciśnięto strzałkę w lewo
                 player.vx = -playerSpeed;              // Ustaw prędkość gracza na ujemną
+                player.scale.x = -3;
             } else if (event.key === 'ArrowRight') {   // Jeśli naciśnięto strzałkę w prawo
                 player.vx = playerSpeed;               // Ustaw prędkość gracza na dodatnią
+                player.scale.x = 3;
             }
         });
         window.addEventListener('keyup', event => {
