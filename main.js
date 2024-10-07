@@ -84,3 +84,13 @@ let undefinedVar;   // oznacza zmienną, która nie została zainicjalizowana
 // konwencja nazewnictwa stałych to wielkie litery
 const CONST_VALUE = 5;
 CONST_VALUE = 10; // to spowoduje błąd
+
+// jak napisać funkcję
+function add(x, y) {
+    return x + y;
+}
+console.log(add(5, 10));
+
+// funkcje strzałkowe (funkcje anonimowe lambda)
+let arrowAdd = (x, y) => x + y;
+console.log(arrowAdd(5, 10));
