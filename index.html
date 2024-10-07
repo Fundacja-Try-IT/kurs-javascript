@@ -20,5 +20,11 @@
     <script src="https://github.com/pixijs/sound/releases/download/v6.0.0/pixi-sound.js"></script>
 
     <script type="module">
+        let app = new PIXI.Application();  // Tworzenie aplikacji PixiJS
+        await app.init({
+            autoDensity: true,             // Automatyczne dostosowanie rozdzielczości
+            resizeTo: document.body        // Rozmiar aplikacji dopasowany do okna przeglądarki
+        });
+        document.body.appendChild(app.canvas); // Dodanie aplikacji do strony
     </script>
 </html>
