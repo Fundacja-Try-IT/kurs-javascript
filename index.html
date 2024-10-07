@@ -84,10 +84,32 @@
             spawnObjectTimeout = setTimeout(spawnObject, 3000);
         }
 
+        // Funkcja wykrywająca kolizje
+        function hitTestRectangle(player, object) {
+            let playerBounds = player.getBounds();  // Granice gracza
+            let objectBounds = object.getBounds();  // Granice obiektu
+
+            if (objectBounds.maxY <= playerBounds.minY || objectBounds.minY >= playerBounds.maxY) {
+                return false;  // Jeśli obiekt jest nad lub pod graczem, nie ma kolizji
+            }
+            if (objectBounds.maxX >= playerBounds.minX && objectBounds.minX <= playerBounds.maxX) {
+                return true;   // Jeśli granice obiektu przecinają się z granicami gracza, jest kolizja
+            }
+
+            return false;      // W przeciwnym wypadku nie ma kolizji
+        }
+
         // Funkcja do aktualizacji pozycji spadających obiektów
         app.ticker.add(() => {
             for (let object of objects) {
                 object.y += object.vy;
+
+                // Detekcja kolizji
+                if (hitTestRectangle(player, object)) {
+                    app.stage.removeChild(object);
+                    objects = objects.filter(o => o !== object);
+                }
+
                 // Usuwanie obiektów, które wypadają z ekranu
                 if (object.getBounds().maxY > app.canvas.height) {
                     app.stage.removeChild(object);
