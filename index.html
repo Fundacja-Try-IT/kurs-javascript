@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Łapacz jabłek</title>
+    <style>
+        html, body {
+            margin: 0px;
+            height: 99.5%;
+            background-color: black;
+        }
+    </style>
+</head>
+
+<body>
+</body>
+    <script src="https://pixijs.download/v8.2.0/pixi.min.js"></script>
+    <script src="https://github.com/pixijs/sound/releases/download/v6.0.0/pixi-sound.js"></script>
+
+    <script type="module">
+        // Parametry gry
+        let playerSpeed = 5;
+        let maxPlayerSpeed = 15;
+        let objectSpeed = 1;
+        let objectScore = 10;
+        let objectSpawnRate = 3000;
+        let objectMinSpawnRate = 400;
+
+        let app = new PIXI.Application();  // Tworzenie aplikacji PixiJS
+        await app.init({
+            autoDensity: true,             // Automatyczne dostosowanie rozdzielczości
+            resizeTo: document.body        // Rozmiar aplikacji dopasowany do okna przeglądarki
+        });
+        document.body.appendChild(app.canvas); // Dodanie aplikacji do strony
+
+        let playerTexture = await PIXI.Assets.load('gracz.png'); // Ładowanie tekstur
+        let backgroundTexture = await PIXI.Assets.load('tlo.png');
+        let objectTexture = await PIXI.Assets.load('obiekt.png');
+        playerTexture.source.scaleMode = 'nearest';              // Ustawienie trybu skalowania
+        backgroundTexture.source.scaleMode = 'nearest';
+        objectTexture.source.scaleMode = 'nearest';
+
+        // Ładowanie dźwięków
+        PIXI.sound.add('przechwyt', 'przechwyt.wav');
+        PIXI.sound.add('koniec_gry', 'koniec_gry.mp3');
+        PIXI.sound.add('upadek', 'upadek.wav');
+
+        let background = PIXI.Sprite.from('tlo.png');
+        background.width = app.canvas.width;                 // Ustawienie szerokości tła na szerokość ekranu
+        background.height = app.canvas.height;               // Ustawienie wysokości tła na wysokość ekranu
+        app.stage.addChild(background);
+
+        let player = PIXI.Sprite.from('gracz.png');          // Tworzenie obiektu gracza
+        player.x = app.canvas.width / 2;                     // Ustawienie pozycji gracza na środku
+        player.y = app.canvas.height - player.height - 10;   // Ustawienie pozycji gracza na dole ekranu
+        player.vx = 0;                                       // Ustawienie początkowej prędkości gracza na 0
+        player.scale.set(3, 3);                              // Ustawienie skali (wielkości) gracza
+        player.anchor.set(0.5);                              // Ustawienie punktu obrotu gracza na środek
+        app.stage.addChild(player);                          // Dodanie gracza do sceny
+
+        window.addEventListener('keydown', event => {
+            if (event.key === 'ArrowLeft') {           // Jeśli naciśnięto strzałkę w lewo
+                player.vx = -playerSpeed;              // Ustaw prędkość gracza na ujemną
+            } else if (event.key === 'ArrowRight') {   // Jeśli naciśnięto strzałkę w prawo
+                player.vx = playerSpeed;               // Ustaw prędkość gracza na dodatnią
+            }
+        });
+        window.addEventListener('keyup', event => {
+            // Jeśli puszczono strzałkę w lewo lub w prawo, zatrzymaj gracza
+            if (event.key === 'ArrowLeft' && player.vx < 0) {
+                player.vx = 0;
+            } else if (event.key === 'ArrowRight' && player.vx > 0) {
+                player.vx = 0;
+            }
+        });
+        
+        app.ticker.add(() => {            // Funkcja aktualizująca pozycję gracza
+            player.x += player.vx;        // Przesunięcie gracza o jego prędkość
+            // Zapobiega wychodzeniu gracza poza granice ekranu
+            player.x = Math.max(player.width / 2, Math.min(app.canvas.width - player.width / 2, player.x));
+        });
+
+        let objects = [];
+        let spawnObjectTimeout;   // Identyfikator ostatniego timeoutu do generowania obiektów
+        
+        // Generator spadających obiektów
+        function spawnObject() {
+            let object = PIXI.Sprite.from('obiekt.png');
+            object.x = Math.random() * (app.canvas.width - object.width - 1);   // Losowa pozycja obiektu
+            object.y = -object.height;                                          // Pozycja startowa obiektu poza ekranem
+            object.vy = objectSpeed + Math.random();                            // Losowa prędkość obiektu
+            object.scale.set(1.2, 1.2);
+            app.stage.addChild(object);
+            objects.push(object);
+            spawnObjectTimeout = setTimeout(spawnObject, objectSpawnRate);
+        }
+
+        // Zwiększanie trudności gry co 5 sekund
+        let updateDifficultyTimeout;
+
+        function updateDifficulty() {
+            playerSpeed = Math.min(maxPlayerSpeed, playerSpeed + 0.5);
+            objectSpeed += 0.2;
+            objectScore += 1;
+            objectSpawnRate = Math.max(objectMinSpawnRate, objectSpawnRate - 100);
+            updateDifficultyTimeout = setTimeout(updateDifficulty, 5000);
+        }
+
+        // Funkcja wykrywająca kolizje
+        function hitTestRectangle(player, object) {
+            let playerBounds = player.getBounds();  // Granice gracza
+            let objectBounds = object.getBounds();  // Granice obiektu
+
+            if (objectBounds.maxY <= playerBounds.minY || objectBounds.minY >= playerBounds.maxY) {
+                return false;  // Jeśli obiekt jest nad lub pod graczem, nie ma kolizji
+            }
+            if (objectBounds.maxX >= playerBounds.minX && objectBounds.minX <= playerBounds.maxX) {
+                return true;   // Jeśli granice obiektu przecinają się z granicami gracza, jest kolizja
+            }
+
+            return false;      // W przeciwnym wypadku nie ma kolizji
+        }
+
+        // Funkcja do aktualizacji pozycji spadających obiektów
+        app.ticker.add(() => {
+            for (let object of objects) {
+                object.y += object.vy;
+
+                // Detekcja kolizji
+                if (hitTestRectangle(player, object)) {
+                    app.stage.removeChild(object);
+                    objects = objects.filter(o => o !== object);
+                    score += objectScore;                     // Zwiększenie wyniku
+                    scoreText.text = `Wynik: ${score}`;       // Aktualizacja tekstu
+                    PIXI.sound.play('przechwyt');             // Odtworzenie dźwięku przechwycenia
+                }
+
+                // Usuwanie obiektów, które wypadają z ekranu
+                if (object.getBounds().maxY > app.canvas.height) {
+                    app.stage.removeChild(object);
+                    objects = objects.filter(o => o !== object);
+                    lives--;                                  // Zmniejszenie liczby żyć
+                    livesText.text = `Liczba żyć: ${lives}`;  // Aktualizacja tekstu
+                    PIXI.sound.play('upadek');                 // Odtworzenie dźwięku upadku
+
+                    if (lives <= 0) {                      // Jeśli liczba żyć spadnie do 0, zakończ grę
+                        mainText.text = 'Koniec gry!';     // Wyświetlenie tekstu końcowego
+                        mainText.x = app.canvas.width / 2 - mainText.width / 2;    // Wyśrodkowanie tekstu
+                        mainText.y = app.canvas.height / 2 - mainText.height / 2;  // Wyśrodkowanie tekstu
+                        app.ticker.stop();                 // Zatrzymanie animacji
+                        clearTimeout(spawnObjectTimeout);  // Zatrzymanie generatora obiektów
+                        clearTimeout(updateDifficultyTimeout);  // Zatrzymanie zwiększania trudności
+                        PIXI.sound.play('koniec_gry');     // Odtworzenie dźwięku końca gry
+                    }
+                }
+            }
+        });
+
+        spawnObject();  // Rozpoczęcie generowania obiektów
+        updateDifficulty();  // Rozpoczęcie zwiększania trudności
+
+        // Tekst z wynikiem
+        let score = 0;
+        let scoreText = new PIXI.Text(`Wynik: ${score}`, { fontSize: 24, fill: 'white' });
+        scoreText.x = 10;
+        scoreText.y = 10;
+        app.stage.addChild(scoreText);
+
+        // Tekst z liczbą żyć
+        let lives = 5;
+        let livesText = new PIXI.Text(`Liczba żyć: ${lives}`, { fontSize: 24, fill: 'white' });
+        livesText.x = app.canvas.width - livesText.width - 30;
+        livesText.y = 10;
+        app.stage.addChild(livesText);
+
+        // Tekst główny
+        let mainText = new PIXI.Text('', { fontSize: 48, fill: 'white' });
+        mainText.x = app.canvas.width / 2 - mainText.width / 2;
+        mainText.y = app.canvas.height / 2 - mainText.height / 2;
+        app.stage.addChild(mainText);
+    </script>
+</html>
