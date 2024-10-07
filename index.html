@@ -34,6 +34,11 @@
         backgroundTexture.source.scaleMode = 'nearest';
         objectTexture.source.scaleMode = 'nearest';
 
+        // Ładowanie dźwięków
+        PIXI.sound.add('przechwyt', 'przechwyt.wav');
+        PIXI.sound.add('koniec_gry', 'koniec_gry.mp3');
+        PIXI.sound.add('upadek', 'upadek.wav');
+
         let background = PIXI.Sprite.from('tlo.png');
         background.width = app.canvas.width;                 // Ustawienie szerokości tła na szerokość ekranu
         background.height = app.canvas.height;               // Ustawienie wysokości tła na wysokość ekranu
@@ -110,6 +115,7 @@
                     objects = objects.filter(o => o !== object);
                     score += 10;                              // Zwiększenie wyniku
                     scoreText.text = `Wynik: ${score}`;       // Aktualizacja tekstu
+                    PIXI.sound.play('przechwyt');             // Odtworzenie dźwięku przechwycenia
                 }
 
                 // Usuwanie obiektów, które wypadają z ekranu
@@ -118,6 +124,7 @@
                     objects = objects.filter(o => o !== object);
                     lives--;                                  // Zmniejszenie liczby żyć
                     livesText.text = `Liczba żyć: ${lives}`;  // Aktualizacja tekstu
+                    PIXI.sound.play('upadek');                 // Odtworzenie dźwięku upadku
 
                     if (lives <= 0) {                      // Jeśli liczba żyć spadnie do 0, zakończ grę
                         mainText.text = 'Koniec gry!';     // Wyświetlenie tekstu końcowego
@@ -125,6 +132,7 @@
                         mainText.y = app.canvas.height / 2 - mainText.height / 2;  // Wyśrodkowanie tekstu
                         app.ticker.stop();                 // Zatrzymanie animacji
                         clearTimeout(spawnObjectTimeout);  // Zatrzymanie generatora obiektów
+                        PIXI.sound.play('koniec_gry');     // Odtworzenie dźwięku końca gry
                     }
                 }
             }
