@@ -29,8 +29,10 @@
 
         let playerTexture = await PIXI.Assets.load('gracz.png'); // Ładowanie tekstur
         let backgroundTexture = await PIXI.Assets.load('tlo.png');
+        let objectTexture = await PIXI.Assets.load('obiekt.png');
         playerTexture.source.scaleMode = 'nearest';              // Ustawienie trybu skalowania
         backgroundTexture.source.scaleMode = 'nearest';
+        objectTexture.source.scaleMode = 'nearest';
 
         let background = PIXI.Sprite.from('tlo.png');
         background.width = app.canvas.width;                 // Ustawienie szerokości tła na szerokość ekranu
@@ -66,5 +68,22 @@
             // Zapobiega wychodzeniu gracza poza granice ekranu
             player.x = Math.max(player.width / 2, Math.min(app.canvas.width - player.width / 2, player.x));
         });
+
+        let objects = [];
+        let spawnObjectTimeout;   // Identyfikator ostatniego timeoutu do generowania obiektów
+        
+        // Generator spadających obiektów
+        function spawnObject() {
+            let object = PIXI.Sprite.from('obiekt.png');
+            object.x = Math.random() * (app.canvas.width - object.width - 1);   // Losowa pozycja obiektu
+            object.y = -object.height;                                          // Pozycja startowa obiektu poza ekranem
+            object.vy = 1;
+            object.scale.set(1.2, 1.2);
+            app.stage.addChild(object);
+            objects.push(object);
+            spawnObjectTimeout = setTimeout(spawnObject, objectSpawnRate);
+        }
+
+        spawnObject();  // Rozpoczęcie generowania obiektów
     </script>
 </html>
