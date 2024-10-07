@@ -34,12 +34,14 @@
             </div>
         </div>
         
-        <!-- jak dostać się do elementu strony i zmienić jego styl -->
+        <!-- jak dodać do elementu strony schemat `event listener` -->
         <script type="text/javascript">
-            setTimeout(() => {
-                let box = document.querySelector('#click');
-                box.style.backgroundColor = 'lightgreen';
-            }, 3000); // zaczekaj 3 sekundy przed zmianą koloru
+            let box = document.querySelector('#click');
+            let score = 0;
+            box.addEventListener('click', () => {
+                score++;
+                box.textContent = `Wynik: ${score}`;
+            });
         </script>
     </body>
 </html>
