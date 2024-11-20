@@ -1,0 +1,8 @@
+Po przeanalizowaniu struktury menu "O NAS" na stronie https://www.tryit.org.pl/pl/, widzimy, że element ten jest częścią nawigacji strony i jest zorganizowany w strukturze `<ul>` i `<li>`. Wewnątrz elementu listy `<li>` znajduje się link `<a>` oraz lista menu `<ul>`. 
+
+Id elementów pojawiających się w rozwijanym menu to:
+- "zarzad",
+- "rada",
+- "pracownicy",
+- "testowa-strona-opinie",
+- "o-nas-statytyski".
