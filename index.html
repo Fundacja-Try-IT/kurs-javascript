@@ -1,0 +1,55 @@
+<html>
+    <head>
+        <title>JavaScript na stronie internetowej</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+            }
+            .container {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+            }
+            .box {
+                width: 200px;
+                height: 200px;
+                background-color: lightblue;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                font-size: 24px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="box" id="click">Kliknij!</div>
+            <div class="box" id="list" style="visibility: hidden;">
+                <ul>
+                    <li>Element 1</li>
+                    <li>Element 2</li>
+                    <li>Element 3</li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- jak zmodyfikować listę -->
+        <script type="text/javascript">
+            let list = document.querySelector('#list');
+            list.style.visibility = 'visible';
+            let box = document.querySelector('#click');
+            box.style.visibility = 'hidden';
+            
+            let items = document.querySelectorAll('#list li');
+            let startValue = 1;
+            
+            setInterval(() => {
+                items.forEach((li, index) => {
+                    li.textContent = `Element ${index + startValue}`;
+                });
+                startValue++;
+            }, 1000);
+        </script>
+    </body>
+</html>
